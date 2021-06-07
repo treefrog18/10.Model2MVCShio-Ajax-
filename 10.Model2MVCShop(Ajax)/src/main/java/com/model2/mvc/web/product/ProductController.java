@@ -1,9 +1,7 @@
 package com.model2.mvc.web.product;
 
+import java.io.File;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,12 +12,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
-import com.model2.mvc.service.domain.User;
 import com.model2.mvc.service.domain.Product;
-import com.model2.mvc.service.user.UserService;
 import com.model2.mvc.service.product.ProductService;
 
 
@@ -33,7 +30,9 @@ public class ProductController {
 	@Qualifier("productServiceImpl")
 	private ProductService productService;
 	//setter Method 구현 않음
-		
+	private static final String FILE_SERVER_PATH = "C:\\Users\\82102\\git\\10.Model2MVCShop(Ajax)\\10.Model2MVCShop(Ajax)\\src\\main\\webapp\\images\\uploadFiles";
+	
+	
 	public ProductController(){
 		System.out.println(this.getClass());
 	}
@@ -59,12 +58,15 @@ public class ProductController {
 	
 	@RequestMapping(value = "addProduct", method=RequestMethod.POST)
 	public String addProduct( @ModelAttribute("product") Product product, 
-			 Model model ) throws Exception {
+			 MultipartFile file, Model model ) throws Exception {
 
 		System.out.println("/product/addProduct : POST");
 
 		String manuDate = product.getManuDate().replace("-", "");
 		product.setManuDate(manuDate); 
+		
+		file.transferTo(new File(FILE_SERVER_PATH, file.getOriginalFilename()));
+		
 		productService.addProduct(product);
 		model.addAttribute("product", product);
 		return "forward:/product/addProduct.jsp";
